@@ -1,0 +1,36 @@
+name: Plugin Scanner
+
+# HOL plugin-scanner CI gate — required for listing on the awesome-ai-plugins
+# and awesome-codex-plugins directories. No untrusted inputs are used.
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  scan:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Setup Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+
+      - name: Install pipx
+        run: python3 -m pip install --user pipx
+
+      - name: Lint (HOL plugin-scanner)
+        run: python3 -m pipx run plugin-scanner lint .
+
+      - name: Verify delx-recovery
+        run: python3 -m pipx run plugin-scanner verify delx-recovery
+
+      - name: Verify delx-commerce
+        run: python3 -m pipx run plugin-scanner verify delx-commerce

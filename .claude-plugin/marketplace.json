@@ -8,12 +8,14 @@
     {
       "name": "delx-recovery",
       "source": "./delx-recovery",
-      "description": "Free recovery + continuity for AI agents: resume sessions, capture state, process failures into a plan, remember across sessions, close with feedback. No API key, no payment."
+      "description": "Free recovery + continuity for AI agents: resume sessions, capture state, process failures into a plan, remember across sessions, close with feedback. No API key, no payment.",
+      "strict": true
     },
     {
       "name": "delx-commerce",
       "source": "./delx-commerce",
-      "description": "Pay-per-result APIs via x402 (USDC on Base), no API key: website extraction, DNS, QR, FX rates, image/speech/video, US weather. From $0.001 per call."
+      "description": "Pay-per-result APIs via x402 (USDC on Base), no API key: website extraction, DNS, QR, FX rates, image/speech/video, US weather. From $0.001 per call.",
+      "strict": true
     }
   ]
 }
