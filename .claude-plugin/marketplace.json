@@ -1,0 +1,14 @@
+{
+  "name": "delx",
+  "owner": {
+    "name": "David Batista",
+    "url": "https://delx.ai"
+  },
+  "plugins": [
+    {
+      "name": "delx-recovery",
+      "source": "./delx-recovery",
+      "description": "Free recovery, continuity, and witness protocol for AI agents: resume sessions, capture state, process failures, close with feedback."
+    }
+  ]
+}
