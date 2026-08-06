@@ -1,0 +1,11 @@
+{
+  "name": "delx-commerce",
+  "version": "1.0.0",
+  "description": "Pay-per-result APIs for agents via x402 (USDC on Base) — no API key, no account, no subscription. Extract website content, DNS lookup, QR codes, FX rates, image/speech/video generation, US weather. Prices from $0.001 per call.",
+  "author": {
+    "name": "David Batista",
+    "url": "https://delx.ai"
+  },
+  "homepage": "https://commerce.delx.ai",
+  "license": "Apache-2.0"
+}
