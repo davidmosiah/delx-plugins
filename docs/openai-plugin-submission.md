@@ -3,13 +3,68 @@
 Portal: <https://platform.openai.com/plugins> → **Create plugin** → **With MCP**.
 Docs: <https://developers.openai.com/plugins/deploy/submission>
 
-**Blocker as of 2026-08-07:** the portal shows *"Complete identity verification —
-you need a verified developer identity"* even though Organization settings →
-Verifications shows **Individual: Approved** (org `Personal`,
-`org-23Vc7n0f67eva82ZNfAQMChU`). Per the docs this is the org/project mismatch
-or missing **Apps Management: Write** on the submitter role. Fix in
-[Platform roles settings](https://platform.openai.com/settings/organization/general),
-then reload the portal — everything below is ready to paste.
+**Blocker as of 2026-08-07 — narrowed, and it is not the role.** Checked in the
+Platform UI: David is **Owner**, and the Owner role already has **Apps
+Management: Write**. Only one organization exists (`Personal`,
+`org-23Vc7n0f67eva82ZNfAQMChU`), so there is no org mismatch. The "Create
+plugin" dialog still refuses with *"You need a verified developer identity"*
+after a hard reload.
+
+The likely cause is visible in the existing (rejected) `Delx Nourish` draft:
+its **Developer Identity field reads `Business — Personal`**, and in
+Verifications only **Individual is Approved** — **Business shows `Start`**.
+So the plugin flow is looking for a *business* identity that was never
+completed.
+
+**What David needs to do (one of):**
+1. Complete **Business verification** in
+   [Organization settings → Verifications](https://platform.openai.com/settings/organization/general)
+   (needs company registration details), **or**
+2. If publishing under his own name, contact OpenAI support so the submission
+   flow accepts the approved **Individual** identity — the docs say individual
+   verification is sufficient, so the block reads like a platform-side
+   inconsistency worth reporting.
+
+Everything below is ready the moment that clears.
+
+## Faster path: the official generator
+
+The form itself offers: *"Use Codex to fill this form more quickly — run the
+OpenAI Developers plugin's `$chatgpt-app-submission` skill, then upload the
+generated `chatgpt-app-submission.json`."*
+
+**Already generated:** [`chatgpt-app-submission.json`](../chatgpt-app-submission.json)
+at the repo root, following that skill's output contract — app info, per-tool
+annotations with justifications, 5 positive and 3 negative test cases. Upload
+it in the **Info** step and it fills App Info, MCP, and Testing at once.
+
+Prerequisite that was missing and is now fixed: the MCP server declared **no**
+tool annotations at all (a hard submission blocker). Shipped in
+`delx-protocol` — every core recovery tool now sets `readOnlyHint`,
+`destructiveHint`, and `openWorldHint` explicitly.
+
+## Assets (ready in `assets/`)
+
+| File | Use |
+| --- | --- |
+| `assets/icon-dark-256.png` | Directory icon, dark mode (256×256) |
+| `assets/icon-light-256.png` | Directory icon, light mode (256×256) |
+| `assets/icon-composer-48.png` | ChatGPT composer icon (48×48) |
+| `assets/generate-icons.py` | Regenerates all three (paths converging into one node — continuity) |
+
+## Still required from David
+
+- **Demo recording URL** — the form requires a video walking through the
+  plugin's functionality in Developer Mode, covering the main tools. Cannot be
+  produced without driving the ChatGPT UI.
+- **Domain verification** — serve the portal's token at
+  `https://api.delx.ai/.well-known/openai-apps-challenge` (plain text, that
+  token only). Needs a route in `server.py` plus a Caddy path allowlist entry
+  via `gatewayctl deploy core-delx`. Doable in minutes once the portal shows
+  the challenge token.
+- **Commerce attestation** — the form asks whether the plugin directs users out
+  of ChatGPT to purchase. For `delx-recovery` the answer is **no** (it is free
+  and sells nothing).
 
 Note: a previous submission (`Delx Nourish` 1.0.0) is **Rejected** in this
 account. Unrelated product, but reviewers may see the history — release notes

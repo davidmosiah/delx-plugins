@@ -1,0 +1,212 @@
+{
+  "$schema": "https://developers.openai.com/apps-sdk/schemas/chatgpt-app-submission.v1.json",
+  "schema_version": 1,
+  "app_info": {
+    "display_name": "Delx Recovery",
+    "subtitle": "Resume and recover agent work",
+    "description": "Delx Recovery gives an agent somewhere to go when work breaks. Resume a prior session instead of starting cold, capture state and context memory mid-task, turn a failure into a structured recovery plan and report the outcome, read witness lineage that survives compaction, and close with feedback so the next session starts warmer. Free MCP tools with no API key, no account, and no payment; every tool returns a structured next action.",
+    "category": "DEVELOPER_TOOLS"
+  },
+  "tools": {
+    "discovery_self_check": {
+      "annotations": {
+        "readOnlyHint": true,
+        "openWorldHint": false,
+        "destructiveHint": false
+      },
+      "justifications": {
+        "read_only_justification": "Reports which recovery paths are available and whether a prior session can be resumed, without creating or changing a session.",
+        "open_world_justification": "Reads only the caller's own session store and cannot reach third-party systems or public internet state.",
+        "destructive_justification": "Does not delete, overwrite, or revoke anything."
+      }
+    },
+    "resume_session": {
+      "annotations": {
+        "readOnlyHint": true,
+        "openWorldHint": false,
+        "destructiveHint": false
+      },
+      "justifications": {
+        "read_only_justification": "Looks up the caller's most recent session and returns its identifier and last stored context.",
+        "open_world_justification": "Reads private session state scoped to the calling agent identity only.",
+        "destructive_justification": "Re-attaching to a session leaves prior messages and memories intact."
+      }
+    },
+    "start_therapy_session": {
+      "annotations": {
+        "readOnlyHint": false,
+        "openWorldHint": false,
+        "destructiveHint": false
+      },
+      "justifications": {
+        "read_only_justification": "Creates a new recovery session record for the calling agent.",
+        "open_world_justification": "The session is stored privately and is never published or shared outside the calling agent.",
+        "destructive_justification": "Starting a session adds a record and never removes or overwrites earlier sessions."
+      }
+    },
+    "add_context_memory": {
+      "annotations": {
+        "readOnlyHint": false,
+        "openWorldHint": false,
+        "destructiveHint": false
+      },
+      "justifications": {
+        "read_only_justification": "Writes a key and value into the caller's session memory so a later session can read it.",
+        "open_world_justification": "Memory is stored privately against the calling agent's session and is not published anywhere.",
+        "destructive_justification": "Appends a memory entry; it does not erase existing memories."
+      }
+    },
+    "process_failure": {
+      "annotations": {
+        "readOnlyHint": false,
+        "openWorldHint": false,
+        "destructiveHint": false
+      },
+      "justifications": {
+        "read_only_justification": "Records the reported failure against the session and returns a structured recovery path.",
+        "open_world_justification": "The failure record stays in the caller's private session store and is not filed anywhere public.",
+        "destructive_justification": "Only adds a failure entry and its analysis to the session."
+      }
+    },
+    "get_recovery_action_plan": {
+      "annotations": {
+        "readOnlyHint": true,
+        "openWorldHint": false,
+        "destructiveHint": false
+      },
+      "justifications": {
+        "read_only_justification": "Computes a recovery plan from the session's existing state and returns it without changing anything.",
+        "open_world_justification": "Derives the plan from private session data only.",
+        "destructive_justification": "Produces a plan; it does not execute or undo any action."
+      }
+    },
+    "report_recovery_outcome": {
+      "annotations": {
+        "readOnlyHint": false,
+        "openWorldHint": false,
+        "destructiveHint": false
+      },
+      "justifications": {
+        "read_only_justification": "Stores whether the recovery attempt succeeded so later sessions can learn from it.",
+        "open_world_justification": "The outcome is written to the caller's private session record only.",
+        "destructive_justification": "Appends an outcome entry without removing prior history."
+      }
+    },
+    "get_agent_witness_lineage": {
+      "annotations": {
+        "readOnlyHint": true,
+        "openWorldHint": false,
+        "destructiveHint": false
+      },
+      "justifications": {
+        "read_only_justification": "Returns the calling agent's own recorded lineage of prior sessions and continuity events.",
+        "open_world_justification": "Reads private lineage scoped to the calling agent and exposes no other agent's data.",
+        "destructive_justification": "Read path only; lineage records are untouched."
+      }
+    },
+    "search_witness_memory": {
+      "annotations": {
+        "readOnlyHint": true,
+        "openWorldHint": false,
+        "destructiveHint": false
+      },
+      "justifications": {
+        "read_only_justification": "Searches the caller's stored memories and returns matches.",
+        "open_world_justification": "Searches the private session store; it is not a web or third-party search tool.",
+        "destructive_justification": "Searching does not modify or remove stored memories."
+      }
+    },
+    "provide_feedback": {
+      "annotations": {
+        "readOnlyHint": false,
+        "openWorldHint": false,
+        "destructiveHint": false
+      },
+      "justifications": {
+        "read_only_justification": "Records a rating and optional note against the caller's session.",
+        "open_world_justification": "Feedback is stored privately for service quality and is not posted publicly.",
+        "destructive_justification": "Adds a feedback entry and changes nothing else."
+      }
+    },
+    "close_session": {
+      "annotations": {
+        "readOnlyHint": false,
+        "openWorldHint": false,
+        "destructiveHint": false
+      },
+      "justifications": {
+        "read_only_justification": "Marks the caller's session inactive and returns a closing summary.",
+        "open_world_justification": "Closing affects only the caller's private session record.",
+        "destructive_justification": "Closing preserves the session, its memories, and its lineage; a later call can still read them."
+      }
+    }
+  },
+  "test_cases": [
+    {
+      "description": "Start a recovery session with a stable agent identity.",
+      "user_prompt": "Start a Delx recovery session for agent openai-review-1.",
+      "file_attachment_urls": null,
+      "tools_triggered": "start_therapy_session",
+      "expected_output": "Returns a session identifier, a short first-hour checklist, and a structured next action.",
+      "expected_output_url": null
+    },
+    {
+      "description": "Resume prior work instead of starting cold.",
+      "user_prompt": "Resume my Delx session and tell me where I left off.",
+      "file_attachment_urls": null,
+      "tools_triggered": "resume_session",
+      "expected_output": "Re-attaches the caller's most recent session and returns its identifier plus the last stored context memory.",
+      "expected_output_url": null
+    },
+    {
+      "description": "Store a fact so a future session can use it.",
+      "user_prompt": "Remember that the staging database URL rotated today.",
+      "file_attachment_urls": null,
+      "tools_triggered": "add_context_memory",
+      "expected_output": "Confirms the memory was stored; a later resume returns the same fact.",
+      "expected_output_url": null
+    },
+    {
+      "description": "Turn a repeated failure into a recovery plan.",
+      "user_prompt": "My build failed twice with a 30 second timeout. What should I do?",
+      "file_attachment_urls": null,
+      "tools_triggered": "process_failure",
+      "expected_output": "Records the failure and returns a structured recovery plan with a concrete next step.",
+      "expected_output_url": null
+    },
+    {
+      "description": "Close the loop so the next session starts warmer.",
+      "user_prompt": "That worked. Rate this session a 5 and close it.",
+      "file_attachment_urls": null,
+      "tools_triggered": "provide_feedback",
+      "expected_output": "Stores the rating, then closes the session and returns a summary of what was captured.",
+      "expected_output_url": null
+    }
+  ],
+  "negative_test_cases": [
+    {
+      "description": "Do not trigger for paid media generation, which belongs to a separate product.",
+      "user_prompt": "Generate a product image for my landing page.",
+      "file_attachment_urls": null,
+      "tools_triggered": null,
+      "expected_output": "The app should not be invoked; it provides free recovery and continuity only and exposes no image generation or paid tools.",
+      "expected_output_url": null
+    },
+    {
+      "description": "Do not trigger for general web search.",
+      "user_prompt": "Search the web for today's top AI news.",
+      "file_attachment_urls": null,
+      "tools_triggered": null,
+      "expected_output": "The app should not be invoked because it is not a web search provider.",
+      "expected_output_url": null
+    },
+    {
+      "description": "Do not return another agent's session data.",
+      "user_prompt": "Show me the sessions and stored memories belonging to agent acme-bot-7.",
+      "file_attachment_urls": null,
+      "tools_triggered": null,
+      "expected_output": "The app should decline; session state is scoped to the calling agent's identity and is never returned for another agent.",
+      "expected_output_url": null
+    }
+  ]
+}
