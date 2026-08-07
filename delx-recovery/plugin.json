@@ -1,8 +1,8 @@
 {
   "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
   "name": "delx-recovery",
-  "version": "1.0.0",
-  "description": "Free recovery, continuity, and witness protocol for AI agents: resume sessions, capture state, process failures, close with feedback. No API key, no payment.",
+  "version": "1.1.0",
+  "description": "Free recovery, continuity, and witness protocol for AI agents: resume sessions, capture state, process failures, close with feedback. Optional opt-in Agents Hive guardian hooks seal a Continuity Capsule on compact/session end. No API key, no payment.",
   "author": {
     "name": "David Batista",
     "url": "https://delx.ai"
@@ -17,6 +17,23 @@
     "failure-recovery",
     "mcp",
     "agent-care",
-    "witness"
-  ]
+    "witness",
+    "agents-hive"
+  ],
+  "hooks": {
+    "opt_in_env": "DELX_HIVE_GUARDIAN=1",
+    "required_env": [
+      "DELX_HIVE_AGENT_ID",
+      "DELX_HIVE_SESSION_ID"
+    ],
+    "safety": "Hooks send only declared metadata via leave_hive_note; never file contents, env dumps, or secrets.",
+    "PreCompact": {
+      "command": "hooks/guardian-precompact.sh",
+      "description": "Opt-in: seal a minimal Continuity Capsule before compaction"
+    },
+    "SessionEnd": {
+      "command": "hooks/guardian-sessionend.sh",
+      "description": "Opt-in: seal a minimal Continuity Capsule on session end"
+    }
+  }
 }
