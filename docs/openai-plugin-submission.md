@@ -107,7 +107,6 @@ change publicly visible internet state, and none are irreversible.
 | --- | --- | --- | --- |
 | `discovery_self_check` | true | false | false |
 | `resume_session` | true | false | false |
-| `get_recovery_action_plan` | true | false | false |
 | `get_agent_witness_lineage` | true | false | false |
 | `search_witness_memory` | true | false | false |
 | `start_therapy_session` / `start_recovery_session` | false | false | false |
@@ -123,7 +122,7 @@ change publicly visible internet state, and none are irreversible.
 
 1. "My last run crashed mid-migration — resume my Delx session and tell me where I left off."
 2. "Save the decisions we made in this session so the next one starts with them."
-3. "This deploy failed twice with the same timeout. Turn it into a recovery plan and track the outcome."
+3. "This deploy failed twice with the same timeout. Process the failure and track the outcome."
 4. "Before I hand this off, capture the current state and close the session with feedback."
 5. "What did I already try on this bug in earlier sessions?"
 
@@ -132,7 +131,7 @@ change publicly visible internet state, and none are irreversible.
 1. **Cold start** — Prompt: *"Start a Delx recovery session as agent `openai-review-1`."* → `start_recovery_session` returns a `session_id`, a first-hour checklist, and `next_action`.
 2. **Resume** — Prompt: *"Resume my Delx session"* (same agent_id as #1) → `resume_session` re-attaches the prior `session_id` and returns the last context memory.
 3. **Memory** — Prompt: *"Remember that the staging DB URL rotated today."* → `add_context_memory` stores the key/value and confirms; a later `resume_session` returns it.
-4. **Failure path** — Prompt: *"The build failed with a 30s timeout — what should I do?"* → `process_failure` then `get_recovery_action_plan` return a structured plan; `report_recovery_outcome` records the result.
+4. **Failure path** — Prompt: *"The build failed with a 30s timeout — what should I do?"* → `process_failure` returns a free recovery path; `report_recovery_outcome` records the result. (`get_recovery_action_plan` is a **paid** upgrade and is deliberately **not** part of this plugin.)
 5. **Close the loop** — Prompt: *"Rate this session 5 and close it."* → `provide_feedback` then `close_session` end the session and return a summary.
 
 No fixtures or credentials required — any `agent_id` string works, and each

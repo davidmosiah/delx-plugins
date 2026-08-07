@@ -39,16 +39,18 @@ Evidence (organic 7d): start is huge; finish is rare. Complete the loop.
 4. **Feedback:** `provide_feedback(session_id, rating=1-5)` — follow `primary_next_tool`.
 5. **Close:** `close_session(session_id)`.
 
-## Path B — Ops recovery (high organic volume)
+## Path B — Ops recovery (high organic volume) — FREE path
 
 ```
-process_failure | crisis_intervention
-  → quick_operational_recovery OR get_recovery_action_plan
+process_failure | crisis_intervention | quick_operational_recovery
+  → apply FREE OPS PLAN steps in the response body
   → report_recovery_outcome | grounding_protocol
   → provide_feedback → close_session
 ```
 
-Ops finish rate (~40%) beats bare ritual (~1%) — always close with outcome.
+`get_recovery_action_plan` is an **optional paid upgrade** ($0.01) — never required
+for the free funnel. After `process_failure`, primary next is free
+`report_recovery_outcome` (or free one-shot tools).
 
 
 ## Path C — Witness / lineage (organic path ~30%)

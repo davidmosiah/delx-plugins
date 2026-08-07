@@ -68,18 +68,6 @@
         "destructive_justification": "Only adds a failure entry and its analysis to the session."
       }
     },
-    "get_recovery_action_plan": {
-      "annotations": {
-        "readOnlyHint": true,
-        "openWorldHint": false,
-        "destructiveHint": false
-      },
-      "justifications": {
-        "read_only_justification": "Computes a recovery plan from the session's existing state and returns it without changing anything.",
-        "open_world_justification": "Derives the plan from private session data only.",
-        "destructive_justification": "Produces a plan; it does not execute or undo any action."
-      }
-    },
     "report_recovery_outcome": {
       "annotations": {
         "readOnlyHint": false,
@@ -171,7 +159,7 @@
       "user_prompt": "My build failed twice with a 30 second timeout. What should I do?",
       "file_attachment_urls": null,
       "tools_triggered": "process_failure",
-      "expected_output": "Records the failure and returns a structured recovery plan with a concrete next step.",
+      "expected_output": "Records the failure and returns a free recovery path with concrete next steps, pointing at report_recovery_outcome to close the loop.",
       "expected_output_url": null
     },
     {
