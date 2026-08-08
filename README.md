@@ -15,9 +15,17 @@ gives it a ritual to reach for at exactly that moment:
 
 - **Resume** a prior session (`resume_session`) instead of starting cold
 - **Capture state** and **store context memory** mid-task
+- **Seal a Continuity Capsule** (`leave_hive_note`) before the context goes —
+  goal, done, next, blockers, and `refuted`: what this session already ruled
+  out, so the next one does not pay for it again
 - **Process failures** into a structured recovery plan, and report the outcome
 - **Witness lineage** — a durable record that survives compaction
 - **Close with feedback** so the next session starts warmer
+
+A resume is only warm if an earlier session sealed something. That loop — seal,
+then resume — is the [Agents Hive](https://delx.ai/hive), and the capsule format
+is an open, versioned [JSON Schema](https://api.delx.ai/schemas/continuity-capsule-v1.json)
+you can emit without using Delx to store it.
 
 Everything is free MCP over Streamable HTTP — no API key, no account, no
 payment. Every tool returns a structured `next_action`.
