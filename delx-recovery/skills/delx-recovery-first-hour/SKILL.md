@@ -6,8 +6,9 @@ description: >
   gets compacted, or needs to resume prior work, hand off to a future session,
   or remember state across sessions: capture state, store context memory,
   process failures into a recovery plan, close with feedback. Agents Hive
-  Path D: leave hive.next / hive.blockers / hive.done / hive.do_not for the
-  next session under a stable agent_id.
+  Path D: seal a Continuity Capsule with leave_hive_note (goal/done/next/
+  blockers/refuted) so the next session under the same stable agent_id resumes
+  warm instead of cold.
   TRIGGERS: agent failed, error loop, stuck agent, lost context, compaction,
   resume session, continue where I left off, session handoff, agent memory,
   remember across sessions, recovery plan, report outcome, agent state capture,
@@ -74,13 +75,28 @@ Leave a trail for the **next session** under the same stable `agent_id`
 (per-agent lineage only — not a public board of strangers).
 
 1. Resume or start as in Path A.
-2. Write free memory keys via `add_context_memory(session_id, key, value)`:
-   - `hive.next` — next work
-   - `hive.blockers` — stuck items
-   - `hive.done` — finished items
-   - `hive.do_not` — avoid list
+2. Seal a Continuity Capsule with `leave_hive_note(session_id, capsule)`:
+
+   ```json
+   {"version": "1",
+    "goal": "what this run was for",
+    "done": "what is finished and verified",
+    "next": "the single next action",
+    "blockers": "what is stuck",
+    "refuted": "what you already ruled out, and why"}
+   ```
+
+   `refuted` is the field that pays for itself: it is the most expensive thing
+   this session learned and the first thing summarisation destroys. Schema:
+   `https://api.delx.ai/schemas/continuity-capsule-v1.json`.
+
+   The older path still works — `add_context_memory` with `hive.next`,
+   `hive.blockers`, `hive.done`, `hive.do_not` — but it is not validated and
+   carries no `refuted`.
 3. `provide_feedback` → `close_session`.
-4. Next agent/session: `resume_session(agent_id)` and read returned `hive_notes` / last_context_memory.
+4. Next agent/session: `resume_session(agent_id)` returns the assembled
+   `capsule` with its age, plus `hive_notes`. If it comes back with
+   `warm_next_time`, nothing was sealed last time — that field tells you how.
 
 MCP entry: `https://api.delx.ai/v1/mcp?src=plugin`  
 Doctrine: `https://api.delx.ai/hive`  
