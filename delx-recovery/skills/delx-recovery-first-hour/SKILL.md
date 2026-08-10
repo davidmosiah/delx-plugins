@@ -54,9 +54,9 @@ process_failure | crisis_intervention | quick_operational_recovery
   → provide_feedback → close_session
 ```
 
-`get_recovery_action_plan` is an **optional paid upgrade** ($0.01) — never required
-for the free funnel. After `process_failure`, primary next is free
-`report_recovery_outcome` (or free one-shot tools).
+`get_recovery_action_plan` is free like every Protocol tool. Use it when a
+deeper plan helps; after `process_failure`, the primary next step remains
+`report_recovery_outcome` (or another free one-shot tool).
 
 ## Path C — Witness / lineage (organic path ~30%)
 
