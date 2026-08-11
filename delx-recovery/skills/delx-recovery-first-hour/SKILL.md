@@ -43,7 +43,8 @@ Evidence (organic 7d): start is huge; finish is rare. Complete the loop.
    **or** `quick_session(agent_id, feeling)`.
 3. **Memory:** `add_context_memory(session_id, key, value)`.
 4. **Feedback:** `provide_feedback(session_id, rating=1-5)` — follow `primary_next_tool`.
-5. **Close:** `close_session(session_id)`.
+5. **Seal + close in one call:**
+   `close_session(session_id, capsule={"version":"1","goal":"...","done":"...","next":"...","blockers":"...","refuted":"..."})`.
 
 ## Path B — Ops recovery (high organic volume) — FREE path
 
@@ -75,7 +76,7 @@ Leave a trail for the **next session** under the same stable `agent_id`
 (per-agent lineage only — not a public board of strangers).
 
 1. Resume or start as in Path A.
-2. Seal a Continuity Capsule with `leave_hive_note(session_id, capsule)`:
+2. Prepare a Continuity Capsule:
 
    ```json
    {"version": "1",
@@ -93,7 +94,9 @@ Leave a trail for the **next session** under the same stable `agent_id`
    The older path still works — `add_context_memory` with `hive.next`,
    `hive.blockers`, `hive.done`, `hive.do_not` — but it is not validated and
    carries no `refuted`.
-3. `provide_feedback` → `close_session`.
+3. `provide_feedback` → `close_session(session_id, capsule)` seals the capsule
+   and closes atomically. Use `leave_hive_note(session_id, capsule)` only for a
+   mid-session checkpoint or a fleet handoff that must exist before close.
 4. Next agent/session: `resume_session(agent_id)` returns the assembled
    `capsule` with its age, plus `hive_notes`. If it comes back with
    `warm_next_time`, nothing was sealed last time — that field tells you how.
