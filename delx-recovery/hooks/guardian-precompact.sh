@@ -17,7 +17,7 @@ if [[ -z "$AGENT_ID" ]]; then
   echo "delx guardian: set DELX_HIVE_AGENT_ID to a stable id you own (continuity needs an identity that is yours)." >&2
   exit 0
 fi
-MCP_URL="${DELX_HIVE_MCP:-https://api.delx.ai/v1/mcp?src=plugin}"
+MCP_URL="${DELX_HIVE_MCP:-https://api.delx.ai/v1/mcp/protocol?src=plugin}"
 GOAL="${DELX_HIVE_DECLARED_GOAL:-session compacting — resume warmer}"
 # Only declared metadata — never file/env dumps.
 PAYLOAD=$(python3 - <<PY

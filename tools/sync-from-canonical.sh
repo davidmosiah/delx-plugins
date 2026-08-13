@@ -15,7 +15,8 @@ fi
 
 # Rewrite: plugin attribution tag on the endpoint; strip internal repo paths.
 sed \
-  -e 's|https://api.delx.ai/mcp` (also `/v1/mcp`)|https://api.delx.ai/v1/mcp?src=plugin`|g' \
+  -e 's|https://api.delx.ai/mcp` (also `/v1/mcp`)|https://api.delx.ai/v1/mcp/protocol?src=plugin`|g' \
+  -e 's|https://api.delx.ai/v1/mcp/protocol?src=[a-z-]*|https://api.delx.ai/v1/mcp/protocol?src=plugin|g' \
   -e 's|https://api.delx.ai/v1/mcp?src=[a-z-]*|https://api.delx.ai/v1/mcp?src=plugin|g' \
   -e '/delx-protocol\/docs\//d' \
   "$CANONICAL" > "$TARGET"

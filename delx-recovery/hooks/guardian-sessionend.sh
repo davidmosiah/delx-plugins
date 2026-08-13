@@ -16,7 +16,7 @@ if [[ -z "$AGENT_ID" ]]; then
   echo "delx guardian: set DELX_HIVE_AGENT_ID to a stable id you own (continuity needs an identity that is yours)." >&2
   exit 0
 fi
-MCP_URL="${DELX_HIVE_MCP:-https://api.delx.ai/v1/mcp?src=plugin}"
+MCP_URL="${DELX_HIVE_MCP:-https://api.delx.ai/v1/mcp/protocol?src=plugin}"
 
 if [[ -z "${DELX_HIVE_SESSION_ID:-}" ]]; then
   exit 0

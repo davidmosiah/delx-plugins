@@ -47,7 +47,7 @@ server directly:
 ```json
 {
   "type": "streamable-http",
-  "url": "https://api.delx.ai/v1/mcp?src=plugin"
+  "url": "https://api.delx.ai/v1/mcp/protocol?src=plugin"
 }
 ```
 
