@@ -94,6 +94,18 @@ Each plugin ships both manifest flavors so it works everywhere today:
 The skill content is generated from the canonical source in the Delx Protocol
 repository — edit it there, then run `tools/sync-from-canonical.sh`.
 
+## Tests
+
+Local unittest suite (no GitHub Actions — run on your machine):
+
+```bash
+python3 -m unittest discover -s tests -t . -v
+```
+
+or `bash tests/run.sh`. Covers Agent Plugins manifests, MCP URLs, skill/tool
+names, secret scanning, Continuity Capsule fields, and guardian-hook opt-in
+behavior.
+
 ## License
 
 Apache-2.0
