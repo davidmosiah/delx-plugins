@@ -36,7 +36,7 @@ CAPSULE_FIELDS = frozenset(
 CAPSULE_VERSIONS = frozenset({"1", "1.0", "v1"})
 CAPSULE_RECOMMENDED = ("version", "goal", "done", "next", "blockers", "refuted")
 
-RECOVERY_MCP_URL = "https://api.delx.ai/v1/mcp?src=plugin"
+RECOVERY_MCP_URL = "https://api.delx.ai/v1/mcp/protocol?src=plugin"
 COMMERCE_MCP_URL = "https://api.delx.ai/v1/mcp?src=plugin-commerce"
 
 # Tools the recovery skill / hooks / ChatGPT submission actually name.
