@@ -97,6 +97,7 @@ class AgentPluginsManifestTests(unittest.TestCase):
                 with self.subTest(plugin=name, rel=rel):
                     vendor = load_json(plugin_dir(name) / rel)
                     self.assertEqual(vendor["name"], canonical["name"])
+                    self.assertEqual(vendor["version"], canonical["version"])
                     self.assertEqual(vendor["license"], canonical["license"])
                     self.assertEqual(
                         vendor["author"]["name"], canonical["author"]["name"]
