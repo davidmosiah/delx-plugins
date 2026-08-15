@@ -31,6 +31,7 @@ class MarketplaceTests(unittest.TestCase):
     def test_marketplace_lists_both_plugins(self) -> None:
         self.assertEqual(self.market["name"], "delx")
         self.assertEqual(self.market["owner"]["name"], "David Batista")
+        self.assertIs(self.market["strict"], True)
         names = [p["name"] for p in self.market["plugins"]]
         self.assertEqual(names, list(PLUGIN_IDS))
 

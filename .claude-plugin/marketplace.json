@@ -4,6 +4,7 @@
     "name": "David Batista",
     "url": "https://delx.ai"
   },
+  "strict": true,
   "plugins": [
     {
       "name": "delx-recovery",
