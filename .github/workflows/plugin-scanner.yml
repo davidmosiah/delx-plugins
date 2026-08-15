@@ -1,36 +1,32 @@
-name: Plugin Scanner
+name: HOL Plugin Scanner
 
-# HOL plugin-scanner CI gate — required for listing on the awesome-ai-plugins
-# and awesome-codex-plugins directories. No untrusted inputs are used.
+# Required by hashgraph-online/awesome-codex-plugins and awesome-ai-plugins
+# contribution gates. They look for this action slug in .github/workflows.
 
 on:
   push:
-    branches:
-      - main
+    branches: [main, master]
   pull_request:
+    branches: [main, master]
   workflow_dispatch:
+
+permissions:
+  contents: read
+  security-events: write
 
 jobs:
   scan:
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 15
     steps:
-      - name: Checkout
-        uses: actions/checkout@v6
+      - uses: actions/checkout@v4
 
-      - name: Setup Python
-        uses: actions/setup-python@v6
+      - name: HOL Plugin Scanner
+        uses: hashgraph-online/ai-plugin-scanner-action@v1
         with:
-          python-version: "3.12"
-
-      - name: Install pipx
-        run: python3 -m pip install --user pipx
-
-      - name: Lint (HOL plugin-scanner)
-        run: python3 -m pipx run plugin-scanner lint .
-
-      - name: Verify delx-recovery
-        run: python3 -m pipx run plugin-scanner verify delx-recovery
-
-      - name: Verify delx-commerce
-        run: python3 -m pipx run plugin-scanner verify delx-commerce
+          plugin_dir: "."
+          mode: scan
+          min_score: 80
+          fail_on_severity: high
+          format: sarif
+          upload_sarif: true
