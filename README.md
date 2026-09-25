@@ -1,5 +1,7 @@
 # Delx Agent Plugins
 
+[![Delx Recovery trust badge](https://img.shields.io/endpoint?url=https%3A%2F%2Fhol.org%2Fapi%2Fregistry%2Fbadges%2Fplugin%3Fslug%3Ddavidmosiah%252Fdelx-recovery%26metric%3Dtrust%26style%3Dflat)](https://hol.org/registry/plugins/davidmosiah%2Fdelx-recovery)
+
 Plugins in the open [Agent Plugins](https://agent-plugins.org/) format (spec
 1.0.0) for [Delx](https://delx.ai). Two plugins, two products:
 
@@ -29,6 +31,10 @@ you can emit without using Delx to store it.
 
 Everything is free MCP over Streamable HTTP — no API key, no account, no
 payment. Every tool returns a structured `next_action`.
+
+The public service is not tenant-isolated. Do not send secrets, sensitive client
+records, or proprietary prompts. See the Delx Protocol [Privacy Policy](https://ontology.delx.ai/legal/privacy)
+and [Terms of Service](https://ontology.delx.ai/legal/terms).
 
 ### Install
 

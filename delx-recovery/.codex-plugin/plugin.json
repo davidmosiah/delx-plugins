@@ -17,5 +17,16 @@
     "agent-care",
     "witness"
   ],
-  "repository": "https://github.com/davidmosiah/delx-plugins"
+  "repository": "https://github.com/davidmosiah/delx-plugins",
+  "interface": {
+    "displayName": "Delx Recovery",
+    "shortDescription": "Free recovery and continuity for AI agents",
+    "longDescription": "Resume sessions, seal continuity notes, process failures, and close with feedback through the free Delx Protocol MCP server.",
+    "developerName": "David Batista",
+    "category": "Productivity",
+    "capabilities": ["Interactive", "Read", "Write"],
+    "websiteURL": "https://delx.ai/hive",
+    "privacyPolicyURL": "https://ontology.delx.ai/legal/privacy",
+    "termsOfServiceURL": "https://ontology.delx.ai/legal/terms"
+  }
 }
