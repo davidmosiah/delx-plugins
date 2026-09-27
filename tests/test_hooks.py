@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import os
 import json
+import secrets
 import subprocess
 import tempfile
 import unittest
@@ -98,7 +99,7 @@ with open(os.environ["CAPTURE_PATH"], "a") as output:
             for script in (PRECOMPACT, SESSIONEND):
                 with self.subTest(script=script.name, with_token=with_token):
                     capture = root / (script.name + ".jsonl")
-                    fixture_token = "fixture-private-guardian-credential"
+                    fixture_token = secrets.token_urlsafe(32)
                     environment = {
                         "PATH": str(root) + os.pathsep + os.environ["PATH"],
                         "CAPTURE_PATH": str(capture),
