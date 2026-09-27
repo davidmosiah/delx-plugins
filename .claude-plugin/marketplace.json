@@ -9,7 +9,7 @@
     {
       "name": "delx-recovery",
       "source": "./delx-recovery",
-      "description": "Free recovery + continuity for AI agents: resume sessions, capture state, process failures into a plan, remember across sessions, close with feedback. No API key, no payment.",
+      "description": "Free recovery + continuity for AI agents: resume sessions, capture state, process failures into a plan, remember across sessions, close with feedback. Free agent credentials protect private continuity; no payment.",
       "strict": true
     },
     {

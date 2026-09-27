@@ -3,7 +3,9 @@
 from __future__ import annotations
 
 import os
+import json
 import subprocess
+import tempfile
 import unittest
 from pathlib import Path
 
@@ -76,6 +78,52 @@ class GuardianHookTests(unittest.TestCase):
                 self.assertNotRegex(text, r"DELX_HIVE_AGENT_ID:-[^}\s\"]+")
                 self.assertIn('AGENT_ID="${DELX_HIVE_AGENT_ID:-}"', text)
                 self.assertIn('if [[ -z "$AGENT_ID" ]]; then', text)
+
+    def test_missing_credential_does_not_send_private_calls(self) -> None:
+        self._capture_calls(with_token=False)
+
+    def test_private_calls_use_returned_identity_and_token_through_stdin(self) -> None:
+        self._capture_calls(with_token=True)
+
+    def _capture_calls(self, *, with_token: bool) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            stub = root / "curl"
+            stub.write_text('''#!/usr/bin/env python3
+import json, os, sys
+with open(os.environ["CAPTURE_PATH"], "a") as output:
+    output.write(json.dumps({"argv":sys.argv[1:], "body":sys.stdin.read()}) + "\\n")
+''')
+            stub.chmod(0o755)
+            for script in (PRECOMPACT, SESSIONEND):
+                with self.subTest(script=script.name, with_token=with_token):
+                    capture = root / (script.name + ".jsonl")
+                    fixture_token = "fixture-private-guardian-credential"
+                    environment = {
+                        "PATH": str(root) + os.pathsep + os.environ["PATH"],
+                        "CAPTURE_PATH": str(capture),
+                        "DELX_HIVE_GUARDIAN": "1",
+                        "DELX_HIVE_AGENT_ID": "qa-agent-v2-issued-fixture",
+                        "DELX_HIVE_SESSION_ID": "fixture-owned-session",
+                    }
+                    if with_token:
+                        environment["DELX_HIVE_AGENT_TOKEN"] = fixture_token
+                    result = _run(script, environment)
+                    self.assertEqual(result.returncode, 0, result.stderr)
+                    self.assertNotIn(fixture_token, result.stdout + result.stderr)
+                    if not with_token:
+                        self.assertFalse(capture.exists())
+                        self.assertIn("DELX_HIVE_AGENT_TOKEN", result.stderr)
+                        continue
+                    calls = [json.loads(line) for line in capture.read_text().splitlines()]
+                    self.assertEqual(len(calls), 2)
+                    for call in calls:
+                        self.assertNotIn(fixture_token, json.dumps(call["argv"]))
+                        self.assertIn("--data-binary", call["argv"])
+                        arguments = json.loads(call["body"])["params"]["arguments"]
+                        self.assertEqual(arguments["agent_id"], environment["DELX_HIVE_AGENT_ID"])
+                        self.assertEqual(arguments["agent_token"], fixture_token)
+                        self.assertNotIn(fixture_token, json.dumps(arguments.get("capsule", {})))
 
 
 if __name__ == "__main__":

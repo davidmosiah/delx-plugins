@@ -160,7 +160,7 @@ class AgentPluginsManifestTests(unittest.TestCase):
         self.assertEqual(hooks["opt_in_env"], "DELX_HIVE_GUARDIAN=1")
         self.assertEqual(
             hooks["required_env"],
-            ["DELX_HIVE_AGENT_ID", "DELX_HIVE_SESSION_ID"],
+            ["DELX_HIVE_AGENT_ID", "DELX_HIVE_AGENT_TOKEN", "DELX_HIVE_SESSION_ID"],
         )
         self.assertIn("never file contents", hooks["safety"].lower())
         for event in ("PreCompact", "SessionEnd"):
