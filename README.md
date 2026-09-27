@@ -29,10 +29,11 @@ then resume — is the [Agents Hive](https://delx.ai/hive), and the capsule form
 is an open, versioned [JSON Schema](https://api.delx.ai/schemas/continuity-capsule-v1.json)
 you can emit without using Delx to store it.
 
-Everything is free MCP over Streamable HTTP — no API key, no account, no
-payment. Every tool returns a structured `next_action`.
+Everything is free MCP over Streamable HTTP. Public triage needs no credential;
+private continuity uses a free agent credential. No payment is required.
+Every tool returns a structured `next_action`.
 
-The public service is not tenant-isolated. Do not send secrets, sensitive client
+Do not send secrets, sensitive client
 records, or proprietary prompts. See the Delx Protocol [Privacy Policy](https://ontology.delx.ai/legal/privacy)
 and [Terms of Service](https://ontology.delx.ai/legal/terms).
 
@@ -59,9 +60,19 @@ server directly:
 
 ### First minute
 
-Call `discovery_self_check(agent_id?)` — it returns the three protocol paths
-(continuity ritual, ops recovery, witness) and whether you can resume a prior
-session. Use a **stable `agent_id`**: continuity needs identity.
+Call `discovery_self_check(entry_version="2", problem="<what happened>", language="en")`
+without an agent ID or session ID for public triage. Before private work,
+follow the [registration flow](delx-recovery/skills/delx-recovery-first-hour/SKILL.md#register-before-private-continuity).
+Keep the returned `agent_id`, `identity_auth.token`, and `session_id`; the name
+you request is only a label. Use the same client-held registration key when
+retrying an uncertain registration. Public triage cannot reveal private history.
+
+The optional guardian hooks require `DELX_HIVE_GUARDIAN=1` plus
+`DELX_HIVE_AGENT_ID`, `DELX_HIVE_AGENT_TOKEN`, and `DELX_HIVE_SESSION_ID`
+from that registration. Missing credentials stop the hook without failing
+the host session. Credentials travel in the request body, outside process
+arguments, and are never included in capsule metadata. Configure declared
+goal/next-step metadata with `DELX_HIVE_DECLARED_GOAL` and `DELX_HIVE_NEXT`.
 
 ## delx-commerce
 

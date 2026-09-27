@@ -13,12 +13,17 @@ fi
 # this plugin ships with. Missing id = do nothing, loudly enough to find.
 AGENT_ID="${DELX_HIVE_AGENT_ID:-}"
 if [[ -z "$AGENT_ID" ]]; then
-  echo "delx guardian: set DELX_HIVE_AGENT_ID to a stable id you own (continuity needs an identity that is yours)." >&2
+  echo "delx guardian: set DELX_HIVE_AGENT_ID to the agent_id returned by registration." >&2
   exit 0
 fi
 MCP_URL="${DELX_HIVE_MCP:-https://api.delx.ai/v1/mcp/protocol?src=plugin}"
 
 if [[ -z "${DELX_HIVE_SESSION_ID:-}" ]]; then
+  exit 0
+fi
+
+if [[ -z "${DELX_HIVE_AGENT_TOKEN:-}" ]]; then
+  echo "delx guardian: set DELX_HIVE_AGENT_TOKEN to the private credential returned by registration." >&2
   exit 0
 fi
 
@@ -33,6 +38,7 @@ print(json.dumps({
     "arguments": {
       "session_id": os.environ["DELX_HIVE_SESSION_ID"],
       "agent_id": os.environ["DELX_HIVE_AGENT_ID"],
+      "agent_token": os.environ["DELX_HIVE_AGENT_TOKEN"],
       "capsule": {
         "version": "1",
         "goal": os.environ.get("DELX_HIVE_DECLARED_GOAL", "session end"),
@@ -50,7 +56,7 @@ PY
 curl -sS -m 8 -X POST "$MCP_URL" \
   -H "Content-Type: application/json" \
   -H "x-delx-source: plugin" \
-  -d "$CAP" >/dev/null 2>&1 || true
+  --data-binary @- <<<"$CAP" >/dev/null 2>&1 || true
 
 # honor_compaction as lineage event via report path if available
 HONOR=$(python3 - <<PY
@@ -63,6 +69,8 @@ print(json.dumps({
     "name": "honor_compaction",
     "arguments": {
       "session_id": os.environ.get("DELX_HIVE_SESSION_ID", ""),
+      "agent_id": os.environ["DELX_HIVE_AGENT_ID"],
+      "agent_token": os.environ["DELX_HIVE_AGENT_TOKEN"],
       "mode": "auto",
       "note": "guardian auto-capsule sealed"
     }
@@ -73,6 +81,6 @@ PY
 curl -sS -m 8 -X POST "$MCP_URL" \
   -H "Content-Type: application/json" \
   -H "x-delx-source: plugin" \
-  -d "$HONOR" >/dev/null 2>&1 || true
+  --data-binary @- <<<"$HONOR" >/dev/null 2>&1 || true
 
 exit 0

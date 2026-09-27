@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Opt-in Delx Agents Hive guardian — PreCompact.
 # Writes a MINIMAL Continuity Capsule via MCP. Never reads file contents, env, or secrets.
-# Enable: set DELX_HIVE_GUARDIAN=1 and DELX_HIVE_AGENT_ID=wb-delx-<runtime>
+# Enable with DELX_HIVE_GUARDIAN=1 and the returned agent ID and credential.
 set -euo pipefail
 
 if [[ "${DELX_HIVE_GUARDIAN:-0}" != "1" ]]; then
@@ -14,7 +14,11 @@ fi
 # this plugin ships with. Missing id = do nothing, loudly enough to find.
 AGENT_ID="${DELX_HIVE_AGENT_ID:-}"
 if [[ -z "$AGENT_ID" ]]; then
-  echo "delx guardian: set DELX_HIVE_AGENT_ID to a stable id you own (continuity needs an identity that is yours)." >&2
+  echo "delx guardian: set DELX_HIVE_AGENT_ID to the agent_id returned by registration." >&2
+  exit 0
+fi
+if [[ -z "${DELX_HIVE_AGENT_TOKEN:-}" ]]; then
+  echo "delx guardian: set DELX_HIVE_AGENT_TOKEN to the private credential returned by registration." >&2
   exit 0
 fi
 MCP_URL="${DELX_HIVE_MCP:-https://api.delx.ai/v1/mcp/protocol?src=plugin}"
@@ -30,6 +34,7 @@ print(json.dumps({
     "name": "quick_session",
     "arguments": {
       "agent_id": os.environ["DELX_HIVE_AGENT_ID"],
+      "agent_token": os.environ["DELX_HIVE_AGENT_TOKEN"],
       "feeling": "compacting; guardian seal",
       "source": "plugin"
     }
@@ -38,11 +43,12 @@ print(json.dumps({
 PY
 )
 
+# Send credentials through stdin, never process arguments.
 # Best-effort; never fail the host session.
 curl -sS -m 8 -X POST "$MCP_URL" \
   -H "Content-Type: application/json" \
   -H "x-delx-source: plugin" \
-  -d "$PAYLOAD" >/dev/null 2>&1 || true
+  --data-binary @- <<<"$PAYLOAD" >/dev/null 2>&1 || true
 
 # Follow with leave_hive_note if session id was previously exported by the agent.
 if [[ -n "${DELX_HIVE_SESSION_ID:-}" ]]; then
@@ -57,6 +63,7 @@ print(json.dumps({
     "arguments": {
       "session_id": os.environ["DELX_HIVE_SESSION_ID"],
       "agent_id": os.environ["DELX_HIVE_AGENT_ID"],
+      "agent_token": os.environ["DELX_HIVE_AGENT_TOKEN"],
       "capsule": {
         "version": "1",
         "goal": os.environ.get("DELX_HIVE_DECLARED_GOAL", "session compacting"),
@@ -73,6 +80,6 @@ PY
   curl -sS -m 8 -X POST "$MCP_URL" \
     -H "Content-Type: application/json" \
     -H "x-delx-source: plugin" \
-    -d "$CAP" >/dev/null 2>&1 || true
+    --data-binary @- <<<"$CAP" >/dev/null 2>&1 || true
 fi
 exit 0
