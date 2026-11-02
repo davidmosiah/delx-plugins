@@ -22,6 +22,30 @@ if [[ -z "${DELX_HIVE_AGENT_TOKEN:-}" ]]; then
   exit 0
 fi
 MCP_URL="${DELX_HIVE_MCP:-https://api.delx.ai/v1/mcp/protocol?src=plugin}"
+
+# Validate before building credential-bearing payloads. Do not print the URL.
+if ! DELX_GUARDIAN_ENDPOINT="$MCP_URL" python3 - <<'PY_ENDPOINT'
+import os, sys
+from urllib.parse import urlsplit
+url = os.environ["DELX_GUARDIAN_ENDPOINT"]
+try:
+    parsed = urlsplit(url)
+    valid = (
+        url == url.strip()
+        and not any(ord(c) < 32 or ord(c) == 127 for c in url)
+        and parsed.scheme == "https" and bool(parsed.hostname)
+        and parsed.username is None and parsed.password is None
+        and not parsed.fragment
+    )
+    parsed.port  # Reject malformed/out-of-range ports.
+except ValueError:
+    valid = False
+sys.exit(0 if valid else 1)
+PY_ENDPOINT
+then
+  echo "delx guardian: DELX_HIVE_MCP must be an HTTPS URL without credentials or fragments; request skipped." >&2
+  exit 0
+fi
 GOAL="${DELX_HIVE_DECLARED_GOAL:-session compacting — resume warmer}"
 # Only declared metadata — never file/env dumps.
 PAYLOAD=$(python3 - <<PY
@@ -45,7 +69,7 @@ PY
 
 # Send credentials through stdin, never process arguments.
 # Best-effort; never fail the host session.
-curl -sS -m 8 -X POST "$MCP_URL" \
+curl -q --proto "=https" --proto-redir "=https" --max-redirs 0 -sS -m 8 -X POST --url "$MCP_URL" \
   -H "Content-Type: application/json" \
   -H "x-delx-source: plugin" \
   --data-binary @- <<<"$PAYLOAD" >/dev/null 2>&1 || true
@@ -77,9 +101,10 @@ print(json.dumps({
 }))
 PY
 )
-  curl -sS -m 8 -X POST "$MCP_URL" \
+  curl -q --proto "=https" --proto-redir "=https" --max-redirs 0 -sS -m 8 -X POST --url "$MCP_URL" \
     -H "Content-Type: application/json" \
     -H "x-delx-source: plugin" \
     --data-binary @- <<<"$CAP" >/dev/null 2>&1 || true
 fi
 exit 0
+
