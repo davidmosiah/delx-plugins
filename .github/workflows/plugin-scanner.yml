@@ -24,6 +24,9 @@ jobs:
       - name: Test guardian endpoint policy offline
         run: python3 -m unittest discover -s tests -p test_https_endpoint.py -v
 
+      - name: Test sanitized scanner coordinates offline
+        run: python3 -m unittest discover -s tests -p test_sarif_summary.py -v
+
       - name: HOL Plugin Scanner
         uses: hashgraph-online/ai-plugin-scanner-action@55616c962cf86368423f7673b2ecdfdbe613d1af # v1.2.515
         with:
@@ -34,3 +37,6 @@ jobs:
           format: sarif
           upload_sarif: true
 
+      - name: Show sanitized scanner coordinates
+        if: ${{ always() }}
+        run: python3 scripts/summarize_scanner_sarif.py
