@@ -1,6 +1,7 @@
 """Own offline fixtures: a fake curl captures argv/stdin; no network provider."""
 import json
 import os
+import secrets
 from pathlib import Path
 import subprocess
 import tempfile
@@ -30,7 +31,7 @@ class EndpointTests(unittest.TestCase):
                     stub.write_text('#!/usr/bin/env python3\nimport json,os,sys\nwith open(os.environ["CAPTURE_PATH"],"a") as f:f.write(json.dumps({"args":sys.argv[1:],"body":sys.stdin.read()})+"\\n")\n')
                     stub.chmod(0o755)
                     capture=tmp/'calls.jsonl'
-                    token='fake-fixture-credential-only'
+                    token=secrets.token_hex(24)  # Generated fixture only; never a real credential.
                     env={'PATH':str(tmp)+os.pathsep+os.defpath,'HOME':str(tmp),'CAPTURE_PATH':str(capture),'DELX_HIVE_GUARDIAN':'1','DELX_HIVE_AGENT_ID':'fixture-agent','DELX_HIVE_AGENT_TOKEN':token,'DELX_HIVE_SESSION_ID':'fixture-session','DELX_HIVE_MCP':endpoint}
                     result=subprocess.run(['/bin/bash',str(ROOT/'delx-recovery/hooks'/hook)],env=env,capture_output=True,text=True,timeout=5)
                     self.assertEqual(result.returncode,0,result.stderr)
