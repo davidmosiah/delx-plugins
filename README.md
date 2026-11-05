@@ -47,6 +47,16 @@ claude plugin marketplace add davidmosiah/delx-plugins
 
 then `/plugin install delx-recovery@delx`.
 
+**Hermes Agent** (portable Agent Plugins package — Hermes loads `plugin.json`,
+`mcp.json`, and the skill; it does not run the Claude Code guardian hooks):
+
+```bash
+hermes plugins install davidmosiah/delx-plugins/delx-recovery --no-enable
+```
+
+then `hermes plugins enable delx-recovery`. The skill loads as
+`delx-recovery:delx-recovery-first-hour`.
+
 **Codex / Cursor / Copilot / VS Code / Kiro** (Agent Plugins format): point
 your client at the `delx-recovery/` directory of this repo, or add the MCP
 server directly:
@@ -105,7 +115,7 @@ Each plugin ships both manifest flavors so it works everywhere today:
 
 | File | Consumer |
 | --- | --- |
-| `plugin.json`, `mcp.json`, `skills/` | [Agent Plugins 1.0.0](https://agent-plugins.org/) clients (ChatGPT/Codex, Cursor, Copilot, VS Code, Kiro) |
+| `plugin.json`, `mcp.json`, `skills/` | [Agent Plugins 1.0.0](https://agent-plugins.org/) clients (ChatGPT/Codex, Cursor, Copilot, VS Code, Kiro, Hermes Agent) |
 | `.claude-plugin/plugin.json`, `.mcp.json` | Claude Code (native plugin format) |
 
 The skill content is generated from the canonical source in the Delx Protocol
