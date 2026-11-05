@@ -1,8 +1,9 @@
 # Hermes Agent plugin catalog — delx-recovery submission
 
-Status: **prepared, not submitted.** Submitting opens a public PR in
-`NousResearch/hermes-agent` from the repository owner's GitHub account and
-needs the owner's explicit go-ahead.
+Status: **submitted 2026-11-05** as
+[NousResearch/hermes-agent#149462](https://github.com/NousResearch/hermes-agent/pull/149462),
+pinned to `c1d4be02df59f05fe65a27000d0b06b28c9733c2`, `requires_hermes: ">=0.21.5"`.
+The entry below shows the shape; the PR holds the exact file.
 
 Only `delx-recovery` (Delx Protocol, free) is in scope. `delx-commerce` stays
 out: Hermes users already reach x402 APIs through the Solana Foundation `pay`
