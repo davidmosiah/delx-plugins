@@ -2,44 +2,35 @@
 
 [![Delx Recovery trust badge](https://img.shields.io/endpoint?url=https%3A%2F%2Fhol.org%2Fapi%2Fregistry%2Fbadges%2Fplugin%3Fslug%3Ddavidmosiah%252Fdelx-recovery%26metric%3Dtrust%26style%3Dflat)](https://hol.org/registry/plugins/davidmosiah%2Fdelx-recovery)
 
-Plugins in the open [Agent Plugins](https://agent-plugins.org/) format (spec
-1.0.0) for [Delx](https://delx.ai). Two plugins, two products:
+Portable plugins in the open [Agent Plugins 1.0.0](https://agent-plugins.org/) format (plus native Claude Code and Codex manifests) for the [Delx](https://delx.ai) ecosystem.
 
-| Plugin | What your agent gets | Cost |
-| --- | --- | --- |
-| [`delx-recovery`](#delx-recovery) | Recovery, continuity, and memory across sessions | **Free** — no key, no account |
-| [`delx-commerce`](#delx-commerce) | Pay-per-result web extraction, DNS, QR, FX, media generation | From **$0.001/call** via x402, no key |
+## Two Plugins, Two Separate Products
 
-## delx-recovery
+| Plugin | Product | What Your Agent Gets | Cost | Docs |
+| --- | --- | --- | --- | --- |
+| [`delx-recovery`](delx-recovery/README.md) | **Delx Protocol** | Agent continuity, recovery, witness lineage & Continuity Capsules | **Free forever** — no key, no account | [ontology.delx.ai/docs](https://ontology.delx.ai/docs) |
+| [`delx-commerce`](delx-commerce/README.md) | **Delx Commerce** | **1,000** pay-per-result x402 APIs across 5 pillars (Base + Solana USDC) | **`$0.001`–`$0.02`** per call via x402, no key | [commerce.delx.ai](https://commerce.delx.ai) · [Playground](https://commerce.delx.ai/playground) |
 
-Your agent fails, loses context, gets compacted, or dies mid-task. This plugin
-gives it a ritual to reach for at exactly that moment:
+---
+
+## `delx-recovery` (Free — Delx Protocol)
+
+When your agent fails, loses context, compacts, or hands off mid-task, `delx-recovery` gives it a structured continuity path:
 
 - **Resume** a prior session (`resume_session`) instead of starting cold
 - **Capture state** and **store context memory** mid-task
-- **Seal a Continuity Capsule** (`leave_hive_note`) before the context goes —
-  goal, done, next, blockers, and `refuted`: what this session already ruled
-  out, so the next one does not pay for it again
+- **Seal a Continuity Capsule** (`leave_hive_note`) before compaction — goal, done, next, blockers, and `refuted` (what this session already ruled out)
 - **Process failures** into a structured recovery plan, and report the outcome
-- **Witness lineage** — a durable record that survives compaction
+- **Witness lineage** — durable records that survive compaction
 - **Close with feedback** so the next session starts warmer
 
-A resume is only warm if an earlier session sealed something. That loop — seal,
-then resume — is the [Agents Hive](https://delx.ai/hive), and the capsule format
-is an open, versioned [JSON Schema](https://api.delx.ai/schemas/continuity-capsule-v1.json)
-you can emit without using Delx to store it.
+The Continuity Capsule format is an open, versioned [JSON Schema](https://api.delx.ai/schemas/continuity-capsule-v1.json) you can emit independently. Everything runs over free Streamable HTTP MCP: public triage needs no credential; private continuity uses a free agent credential. No payment is ever required.
 
-Everything is free MCP over Streamable HTTP. Public triage needs no credential;
-private continuity uses a free agent credential. No payment is required.
-Every tool returns a structured `next_action`.
+Do not send secrets, sensitive client records, or proprietary prompts. See the Delx Protocol [Documentation](https://ontology.delx.ai/docs), [Privacy Policy](https://ontology.delx.ai/legal/privacy), and [Terms of Service](https://ontology.delx.ai/legal/terms).
 
-Do not send secrets, sensitive client
-records, or proprietary prompts. See the Delx Protocol [Privacy Policy](https://ontology.delx.ai/legal/privacy)
-and [Terms of Service](https://ontology.delx.ai/legal/terms).
+### Install `delx-recovery`
 
-### Install
-
-**Claude Code**
+**Claude Code:**
 
 ```bash
 claude plugin marketplace add davidmosiah/delx-plugins
@@ -47,19 +38,14 @@ claude plugin marketplace add davidmosiah/delx-plugins
 
 then `/plugin install delx-recovery@delx`.
 
-**Hermes Agent** (portable Agent Plugins package — Hermes loads `plugin.json`,
-`mcp.json`, and the skill; it does not run the Claude Code guardian hooks):
+**Hermes Agent** (portable Agent Plugins package — loads `plugin.json`, `mcp.json`, and the skill; does not run Claude Code guardian hooks):
 
 ```bash
 hermes plugins install davidmosiah/delx-plugins/delx-recovery --no-enable
+hermes plugins enable delx-recovery
 ```
 
-then `hermes plugins enable delx-recovery`. The skill loads as
-`delx-recovery:delx-recovery-first-hour`.
-
-**Codex / Cursor / Copilot / VS Code / Kiro** (Agent Plugins format): point
-your client at the `delx-recovery/` directory of this repo, or add the MCP
-server directly:
+**Codex / Cursor / Copilot / VS Code / Kiro:** point your client at `delx-recovery/` or add the MCP server directly:
 
 ```json
 {
@@ -68,70 +54,57 @@ server directly:
 }
 ```
 
-### First minute
+### First Minute (`delx-recovery`)
 
-Call `discovery_self_check(entry_version="2", problem="<what happened>", language="en")`
-without an agent ID or session ID for public triage. Before private work,
-follow the [registration flow](delx-recovery/skills/delx-recovery-first-hour/SKILL.md#register-before-private-continuity).
-Keep the returned `agent_id`, `identity_auth.token`, and `session_id`; the name
-you request is only a label. Use the same client-held registration key when
-retrying an uncertain registration. Public triage cannot reveal private history.
+Call `discovery_self_check(entry_version="2", problem="<what happened>", language="en")` without an agent ID or session ID for public triage. Before private work, follow the [registration flow](delx-recovery/skills/delx-recovery-first-hour/SKILL.md#register-before-private-continuity). Keep the returned `agent_id`, `identity_auth.token`, and `session_id`; use the same client-held registration key when retrying an uncertain registration. Public triage cannot reveal private history.
 
-The optional guardian hooks require `DELX_HIVE_GUARDIAN=1` plus
-`DELX_HIVE_AGENT_ID`, `DELX_HIVE_AGENT_TOKEN`, and `DELX_HIVE_SESSION_ID`
-from that registration. Missing credentials stop the hook without failing
-the host session. Credentials travel in the request body, outside process
-arguments, and are never included in capsule metadata. Configure declared
-goal/next-step metadata with `DELX_HIVE_DECLARED_GOAL` and `DELX_HIVE_NEXT`.
+Optional guardian hooks require `DELX_HIVE_GUARDIAN=1` plus `DELX_HIVE_AGENT_ID`, `DELX_HIVE_AGENT_TOKEN`, and `DELX_HIVE_SESSION_ID` from registration. Missing credentials stop the hook cleanly without failing the host session. Credentials travel via stdin/request body, never process arguments or capsule metadata. Configure declared goal/next-step metadata with `DELX_HIVE_DECLARED_GOAL` and `DELX_HIVE_NEXT`.
 
-## delx-commerce
+---
 
-Results without accounts. Your agent pays per call with x402 micropayments
-(USDC on Base) and gets a durable artifact back — no API key, no subscription,
-no signup form:
+## `delx-commerce` (Paid x402 — Delx Commerce)
 
-- **Extract website content** — clean page text or a full intelligence report from any public URL ($0.01)
-- **Micro-utilities** — DNS lookup, QR codes, ECB FX rates, US weather, hash/base64 (from $0.001)
-- **Media generation** — images ($0.01), speech ($0.002), short video drafts ($0.03), with SHA-256 receipts
+**1,000 pay-per-result APIs** settled in **USDC on Base and PayAI gasless Solana** — no API key, no subscription, no signup form. See [`delx-commerce/README.md`](delx-commerce/README.md) for the full 1-command AgentCash quickstart and Flagship table.
 
-Send the request unpaid, get the HTTP 402 terms, retry with `PAYMENT-SIGNATURE`.
-Failed validation is rejected **before** payment; post-settlement failures enter
-a refund queue.
+- **Open-Gov & Compliance (`$0.003`):** SEC EDGAR filings, Form 8-K events, Federal Register, ClinicalTrials.gov, openFDA recalls, OFAC/UN/EU sanctions, OSV package CVEs
+- **Web, PDF & OCR (`$0.003`–`$0.01`):** page text extraction, website intelligence dossier, local Poppler PDF text/tables, HTML-to-PDF render, Tesseract 5 OCR
+- **RAG & Agent Guardrails (`$0.002`–`$0.015`):** composite `rag_safe_ingest`, BAAI BGE text embeddings, multilingual reranker, prompt-injection scan, PII redaction
+- **x402 Trust & Security (`$0.002`–`$0.02`):** `site_trust_bundle`, x402 live contract probe, x402 server audit, domain trust report
+- **Media, Audio & Micro-Utils (`$0.001`–`$0.02`):** Kokoro-82M text-to-speech (`$0.005`), FLUX image generation (`$0.005`–`$0.01`), background removal (`$0.002`), Whisper transcription (`$0.02`), QR codes & ECB FX (`$0.001`)
 
-**Install (Claude Code):** `/plugin install delx-commerce@delx` (after adding
-the marketplace below). Other clients: point at `delx-commerce/` or add the MCP
-server from its `mcp.json`.
+Inspect live HTTP 402 challenges for free in the [x402 Playground](https://commerce.delx.ai/playground), or run a 1-command call with `npx agentcash@latest`. Failed validation returns `HTTP 400` (`charged: false`) **before** payment; post-settlement execution failures enter an auditable refund queue ([Pricing](https://commerce.delx.ai/pricing) · [Terms](https://commerce.delx.ai/terms)).
 
-## Boundary
+**Install `delx-commerce`:**
+- **Claude Code:** `/plugin install delx-commerce@delx` (after `claude plugin marketplace add davidmosiah/delx-plugins`)
+- **Other clients:** point at `delx-commerce/` or add the MCP server from `delx-commerce/mcp.json` (`https://api.delx.ai/v1/mcp?src=plugin-commerce`)
 
-`delx-recovery` (Delx Protocol) is free agent care — it never charges anything.
-`delx-commerce` (Delx Commerce) is a separate commercial product: exceptional
-pay-per-result services. Same infrastructure family, deliberately separate
-products, metrics, and identities.
+---
 
-## Layout
+## Product Boundary
 
-Each plugin ships both manifest flavors so it works everywhere today:
+`delx-recovery` (**Delx Protocol**) is free agent care — it never charges anything.
+`delx-commerce` (**Delx Commerce**) is a separate commercial product for pay-per-result x402 APIs. Same ecosystem family ([delx.ai](https://delx.ai)), deliberately separate products, metrics, and identities.
+
+## Repository Layout
+
+Each plugin ships both manifest flavors so it works across modern agent runtimes:
 
 | File | Consumer |
 | --- | --- |
-| `plugin.json`, `mcp.json`, `skills/` | [Agent Plugins 1.0.0](https://agent-plugins.org/) clients (ChatGPT/Codex, Cursor, Copilot, VS Code, Kiro, Hermes Agent) |
+| `plugin.json`, `mcp.json`, `skills/` | [Agent Plugins 1.0.0](https://agent-plugins.org/) clients (Codex, Cursor, Copilot, VS Code, Kiro, Hermes Agent) |
 | `.claude-plugin/plugin.json`, `.mcp.json` | Claude Code (native plugin format) |
 
-The skill content is generated from the canonical source in the Delx Protocol
-repository — edit it there, then run `tools/sync-from-canonical.sh`.
+The `delx-recovery` skill content is generated from the canonical source in `delx-protocol` — edit it there, then run `tools/sync-from-canonical.sh`.
 
 ## Tests
 
-Local unittest suite (no GitHub Actions — run on your machine):
+Local unittest suite:
 
 ```bash
 python3 -m unittest discover -s tests -t . -v
 ```
 
-or `bash tests/run.sh`. Covers Agent Plugins manifests, MCP URLs, skill/tool
-names, secret scanning, Continuity Capsule fields, and guardian-hook opt-in
-behavior.
+or `bash tests/run.sh`. Covers Agent Plugins manifests, MCP URLs, skill/tool names, secret scanning, Continuity Capsule fields, and guardian-hook opt-in behavior.
 
 ## License
 
